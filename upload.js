@@ -32,12 +32,11 @@ function getRandomInt(max) {
         });
         const csvString = await fs.readFile(`./${file}`, 'utf-8');
 
-        const rows = await csv.parse(csvString,{delimiter:';'})
+        const rows = await csv.parse(csvString,{delimiter:','})
         const data = Object.values(rows).slice(1)
         let best_files_object = {}
         for (let value of data) {
-            const [video_uri,name,type,quality,file_type,expires,link,size_short ] = value;
-            const vimeo_id = video_uri.replace('/videos/','')
+            const [_,vimeo_id,name,__,___,link ] = value;
             const existent_video = videos.find(video=>{
                 if(!video.description) return false
                 const panda_vimeo_id = video.description.replace('vimeo-','')
@@ -46,14 +45,7 @@ function getRandomInt(max) {
             if(existent_video) {
                 continue
             }
-            if(!best_files_object[vimeo_id] || file_type==='source' || quality==='source'){
-                best_files_object[vimeo_id] = {name,quality,link,vimeo_id}
-                continue
-            }
-            if(best_files_object[vimeo_id].quality ==='sd' && quality==='hd'){
-                best_files_object[vimeo_id] = {name,quality,link,vimeo_id}
-                continue
-            }
+            best_files_object[vimeo_id] = {name,link,vimeo_id}
         }
         
         let best_files = Object.keys(best_files_object).map(item=>best_files_object[item])
